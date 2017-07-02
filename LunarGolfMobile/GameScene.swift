@@ -6,105 +6,117 @@
 //  Copyright © 2017 TwoNerdsGamesCo. All rights reserved.
 //
 
+//
+//  GameScene.swift
+//  FlappyBird
+//
+//  Created by Nate Murray on 6/2/14.
+//  Copyright (c) 2014 Fullstack.io. All rights reserved.
+//
+
 import SpriteKit
-import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate{
     
-    var entities = [GKEntity]()
-    var graphs = [String : GKGraph]()
+    var rocket:SKSpriteNode!
+    var planet:SKSpriteNode!
+    var moon:SKSpriteNode!
+    var blackhole:SKSpriteNode!
+    var spaceColor:SKColor!
+    var canRestart = Bool()
+    var scoreLabelNode:SKLabelNode!
+    var score = NSInteger()
     
-    private var lastUpdateTime : TimeInterval = 0
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
+    let rocketCategory: UInt32 = 1 << 0
+    let worldCategory: UInt32 = 1 << 1
+    let planetCategory: UInt32 = 1 << 2
+    let gravityCategory: UInt32 = 0x1 << 0
     
-    override func sceneDidLoad() {
-
-        self.lastUpdateTime = 0
+    
+    override func didMove(to view: SKView) {
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
+        canRestart = false
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
+        // setup physics
+        self.physicsWorld.gravity = CGVector( dx: 0.0, dy: 0.0 )
+        self.physicsWorld.contactDelegate = self
         
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
+        // setup background color
+        spaceColor = SKColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
+        self.backgroundColor = spaceColor
+        
+        // setup rocket and planet
+        let planetTexture = SKTexture(imageNamed: "planet")
+        planet = SKSpriteNode(texture: planetTexture)
+        planet.setScale(0.15)
+        planet.position = CGPoint(x: self.frame.size.width * 0.5, y:self.frame.size.height * 0.5)
+        
+        planet.physicsBody = SKPhysicsBody(circleOfRadius: planet.size.height / 2.0)
+        planet.physicsBody?.isDynamic = true
+        planet.physicsBody?.allowsRotation = true
+        planet.physicsBody?.mass = 10000
+        planet.physicsBody?.affectedByGravity = true
+        // add gravity to planet
+        let gravity = SKFieldNode.radialGravityField()
+        gravity.strength = 15
+        gravity.categoryBitMask = gravityCategory
+        planet.addChild(gravity)
+        
+        let rocketTexture = SKTexture(imageNamed: "rocket")
+        rocket = SKSpriteNode(texture: rocketTexture)
+        rocket.setScale(0.15)
+        rocket.position = CGPoint(x: planet.position.x + 1.1*planet.size.width/2 + rocket.size.width/2, y:planet.position.y)
+        rocket.zRotation = CGFloat(-1*Double.pi/2)
+        
+        rocket.physicsBody = SKPhysicsBody(circleOfRadius: rocket.size.height / 2.0)
+        rocket.physicsBody?.isDynamic = true
+        rocket.physicsBody?.allowsRotation = true
+        rocket.physicsBody?.mass = 1
+        rocket.physicsBody?.affectedByGravity = true
+        rocket.physicsBody?.restitution = 10
+        rocket.physicsBody?.linearDamping = 0
+        
+        rocket.physicsBody?.categoryBitMask = rocketCategory
+        rocket.physicsBody?.collisionBitMask = worldCategory | planetCategory
+        rocket.physicsBody?.contactTestBitMask = worldCategory | planetCategory
+        
+        self.addChild(planet)
+        self.addChild(rocket)
+        
+        
+        
+        // create score tracker
+        score = 0
+        scoreLabelNode = SKLabelNode(fontNamed:"Arial")
+        scoreLabelNode.position = CGPoint( x: self.frame.midX, y: 3 * self.frame.size.height / 4 )
+        scoreLabelNode.zPosition = 100
+        scoreLabelNode.text = String(score)
+        self.addChild(scoreLabelNode)
+        
     }
     
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+        for _ in touches { // do we need all touches?
+            rocket.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            rocket.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 50))
         }
-        
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
     }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+    //figure out different gestures
+    func rotateGesture(sender: UIRotationGestureRecognizer){
+        sender.view?.transform = (sender.view?.transform)!.rotated(by: sender.rotation)
+        sender.rotation = 0
+        print("rotate gesture")
     }
-    
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    func pinchGesture(sender: UIPinchGestureRecognizer){
+        sender.view?.transform = (sender.view?.transform)!.scaledBy(x: sender.scale, y: sender.scale)
+        sender.scale = 1
+        print("pinch gesture")
     }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-        
-        // Initialize _lastUpdateTime if it has not already been
-        if (self.lastUpdateTime == 0) {
-            self.lastUpdateTime = currentTime
-        }
-        
-        // Calculate time since last update
-        let dt = currentTime - self.lastUpdateTime
-        
-        // Update entities
-        for entity in self.entities {
-            entity.update(deltaTime: dt)
-        }
-        
-        self.lastUpdateTime = currentTime
+        // put stuff here
     }
+    
 }
+

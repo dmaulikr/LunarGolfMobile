@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6AB2FD601F09593A00778932"
+               BlueprintIdentifier = "6AFC9FE81F09622E00094DB7"
                BuildableName = "LunarGolfMobile.app"
                BlueprintName = "LunarGolfMobile"
                ReferencedContainer = "container:LunarGolfMobile.xcodeproj">
@@ -28,31 +28,11 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6AB2FD7A1F09593A00778932"
-               BuildableName = "LunarGolfMobileTests.xctest"
-               BlueprintName = "LunarGolfMobileTests"
-               ReferencedContainer = "container:LunarGolfMobile.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6AB2FD851F09593A00778932"
-               BuildableName = "LunarGolfMobileUITests.xctest"
-               BlueprintName = "LunarGolfMobileUITests"
-               ReferencedContainer = "container:LunarGolfMobile.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6AB2FD601F09593A00778932"
+            BlueprintIdentifier = "6AFC9FE81F09622E00094DB7"
             BuildableName = "LunarGolfMobile.app"
             BlueprintName = "LunarGolfMobile"
             ReferencedContainer = "container:LunarGolfMobile.xcodeproj">
@@ -75,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6AB2FD601F09593A00778932"
+            BlueprintIdentifier = "6AFC9FE81F09622E00094DB7"
             BuildableName = "LunarGolfMobile.app"
             BlueprintName = "LunarGolfMobile"
             ReferencedContainer = "container:LunarGolfMobile.xcodeproj">
@@ -94,7 +74,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6AB2FD601F09593A00778932"
+            BlueprintIdentifier = "6AFC9FE81F09622E00094DB7"
             BuildableName = "LunarGolfMobile.app"
             BlueprintName = "LunarGolfMobile"
             ReferencedContainer = "container:LunarGolfMobile.xcodeproj">
