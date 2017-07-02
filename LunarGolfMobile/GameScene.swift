@@ -38,6 +38,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate{
         canRestart = false
         
         // setup physics
+        //note I am note sure how to get the contact delagate to really work
         self.physicsWorld.gravity = CGVector( dx: 0.0, dy: 0.0 )
         self.physicsWorld.contactDelegate = self
         
